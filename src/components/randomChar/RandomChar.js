@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 
-import MarvelService from '../../services/MarvelService';
+import useMarvelService from '../../services/MarvelService';
 import './randomChar.scss';
 import mjolnir from '../../resources/img/mjolnir.png';
 import Spinner from '../spinner/Spinner';
@@ -8,47 +8,26 @@ import ErrorMessage from '../errorMessage/ErrorMessage';
 
 const RandomChar = () => {
     const [char, setChar] = useState({});
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState(false);
 
-    const marvelService = new MarvelService();
+    const { loading, error, getOneCharacter } = useMarvelService();
 
     useEffect(() => {
         updateChar()
     }, [])
 
     const onCharLoaded = (newChar) => {
-        setChar(char => newChar);
-        setLoading(false);
-    }
-
-    const onCharLoading = () => {
-        setLoading(true);
-    }
-    
-    const onError = () => {
-        setLoading(false);
-        setError(true);
+        setChar(newChar);
     }
 
     const updateChar = () => {
         const id = Math.floor(Math.random() * (1011400 - 1011000) + 1011000);
-        onCharLoading();
-        marvelService
-            .getOneCharacter(id)
-            .then(data => onCharLoaded(data)) 
-            .catch(err => onError())
-    }
-
-    const onTryAnotherClick = () => {
-        setError(false);
-        updateChar();
+        getOneCharacter(id)
+            .then(data => onCharLoaded(data))
     }
 
     const errorMessage = error ? <ErrorMessage /> : null;
     const spinner = loading ? <Spinner /> : null;
     const content = !(loading || error) ? <View char = {char} /> : null;
-
 
     return (
         <div className="randomchar">
@@ -63,7 +42,7 @@ const RandomChar = () => {
                 <p className="randomchar__title">
                     Or choose another one
                 </p>
-                <button className="button button__main" onClick={onTryAnotherClick}>
+                <button className="button button__main" onClick={updateChar}>
                     <div className="inner">try it</div>
                 </button>
                 <img src={mjolnir} alt="mjolnir" className="randomchar__decoration" />
@@ -74,7 +53,7 @@ const RandomChar = () => {
 
 const View = ({char}) => {
     const {name, description, thumbnail, homepage, wiki} = char;
-    const objectFit = thumbnail.includes('not_available') ? "contain" : "cover";
+    const objectFit = (thumbnail && thumbnail.includes('not_available')) ? "contain" : "cover";
 
     return (
         <div className="randomchar__block">
