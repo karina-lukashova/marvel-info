@@ -16,11 +16,11 @@ const CharList = (props) => {
     const { loading, error, getAllCharacters } = useMarvelService();
 
     useEffect(() => {
-        onRequest();
+        onRequest(offset, true);
     }, [])
 
-    const onRequest = (offset) => {
-        setItemsLoading(true);
+    const onRequest = (offset, initial) => {
+        initial ? setItemsLoading(false) : setItemsLoading(true);
         getAllCharacters(offset)
             .then(data => onCharListLoaded(data))
     }
@@ -80,14 +80,13 @@ const CharList = (props) => {
     const items = renderItems(charList);
 
     const errorMessage = error ? <ErrorMessage/> : null;
-    const spinner = loading ? <Spinner/> : null;
-    const content = !(loading || error) ? items : null;
+    const spinner = loading && !newItemsLoading ? <Spinner/> : null;
 
     return (
         <div className="char__list">
             {errorMessage}
             {spinner}
-            {content}
+            {items}
             <button
                 className="button button__main button__long"
                 disabled={newItemsLoading}
