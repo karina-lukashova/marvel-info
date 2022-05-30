@@ -66,7 +66,7 @@ const View = ({char}) => {
                 const comicId = item.resourceURI.replace('http://gateway.marvel.com/v1/public/comics/', '');
                 return (
                     <li key={i} className="char__comics-item" >
-                        <Link to={"/comics/" + comicId}>{item.name}</Link>
+                        <Link to={"/marvel-info/comics/" + comicId}>{item.name}</Link>
                     </li>
                 )
             })
